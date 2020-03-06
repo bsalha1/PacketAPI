@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PacketAPI:jar">
+    <output-path>$USER_HOME$/OneDrive/Documents/Server1.8.8/plugins</output-path>
+    <root id="archive" name="PacketAPI.jar">
+      <element id="module-output" name="PacketAPI" />
+    </root>
+  </artifact>
+</component>
