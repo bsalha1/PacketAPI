@@ -210,7 +210,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int x = ReflectionUtils.getPrivateField("b", pack);
                 int y = ReflectionUtils.getPrivateField("c", pack);
                 int z = ReflectionUtils.getPrivateField("d", pack);
-                Vector vector = new Vector(x, y, z);
+                Vector<Integer> vector = new Vector<>(x, y, z);
                 byte yaw = ReflectionUtils.getPrivateField("e", pack);
                 byte pitch = ReflectionUtils.getPrivateField("f", pack);
                 boolean onGround = ReflectionUtils.getPrivateField("g", pack);
@@ -352,7 +352,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int vy = ReflectionUtils.getPrivateField("g", pack);
                 int vz = ReflectionUtils.getPrivateField("h", pack);
                 Vector<Integer> v = new Vector<>(vx, vy, vz);
-                
+
                 byte yaw = ReflectionUtils.getPrivateField("i", pack);
                 byte pitch = ReflectionUtils.getPrivateField("j", pack);
                 byte headPitch = ReflectionUtils.getPrivateField("k", pack);
@@ -369,20 +369,60 @@ public class Version_1_8_R3 implements INMSHandler
         }
         else if(packet instanceof PacketPlayOutSpawnEntityPainting)
         {
-            PacketPlayOutSpawnEntityPainting pack = (PacketPlayOutSpawnEntityPainting) packet;
+            try
+            {
+                PacketPlayOutSpawnEntityPainting pack = (PacketPlayOutSpawnEntityPainting) packet;
+                int entityId = ReflectionUtils.getPrivateField("a", pack);
+                BlockPosition bpos = ReflectionUtils.getPrivateField("b", pack);
+                Vector<Integer> r = new Vector<>(bpos.getX(), bpos.getY(), bpos.getZ());
+                BlockFace bface = directionToBlockFace(ReflectionUtils.getPrivateField("c", pack));
+                String painting = ReflectionUtils.getPrivateField("d", pack);
+                return new PacketServerSpawnEntityPainting(entityId, r, bface, painting);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+
 
         }
         else if(packet instanceof PacketPlayOutSpawnEntityWeather)
         {
-
+            try
+            {
+                PacketPlayOutSpawnEntityWeather pack = (PacketPlayOutSpawnEntityWeather) packet;
+                int entityId = ReflectionUtils.getPrivateField("a", pack);
+                int x = ReflectionUtils.getPrivateField("b", pack);
+                int y = ReflectionUtils.getPrivateField("c", pack);
+                int z = ReflectionUtils.getPrivateField("d", pack);
+                Vector<Integer> r = new Vector<>(x, y, z);
+                int weatherType = ReflectionUtils.getPrivateField("e", pack);
+                return new PacketServerSpawnEntityWeather(entityId, r, weatherType);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else if(packet instanceof PacketPlayOutTileEntityData)
         {
-
+            try
+            {
+                PacketPlayOutTileEntityData pack = (PacketPlayOutTileEntityData) packet;
+                BlockPosition bpos = ReflectionUtils.getPrivateField("a", pack);
+                Vector<Integer> r = new Vector<>(bpos.getX(), bpos.getY(), bpos.getZ());
+                int action = ReflectionUtils.getPrivateField("b", pack);
+                // TODO: handle NBT payload
+                return new PacketServerTileEntityData(r, action);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else if(packet instanceof PacketPlayOutUpdateEntityNBT)
         {
-
+            // TODO: literally no idea what anything does in this
         }
         return null;
     }

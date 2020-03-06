@@ -1,5 +1,7 @@
 package com.reliableplugins.packetapi.type.packet.server.entity;
 
-public class PacketServerUpdateEntityNBT
+import com.reliableplugins.packetapi.type.packet.Packet;
+
+public class PacketServerUpdateEntityNBT extends Packet
 {
 }

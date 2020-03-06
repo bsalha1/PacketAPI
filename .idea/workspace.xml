@@ -6,7 +6,15 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dfccaa08-fa17-4489-9ba8-25db47b77621" name="Default Changelist" comment="" />
+    <list default="true" id="dfccaa08-fa17-4489-9ba8-25db47b77621" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/nms/Version_1_8_R3.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/nms/Version_1_8_R3.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerSpawnEntityPainting.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerSpawnEntityPainting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerSpawnEntityWeather.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerSpawnEntityWeather.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerTileEntityData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerTileEntityData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerUpdateEntityNBT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/reliableplugins/packetapi/type/packet/server/entity/PacketServerUpdateEntityNBT.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,7 +31,11 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1YcnlCBpcFsAOHdVjXUWglp9Ulm" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -31,6 +43,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/OneDrive/Documents/Java Archives/spigot/spigot1.12.2.jar!/" />
@@ -67,7 +80,8 @@
       <option name="presentableId" value="Default" />
       <updated>1583250898048</updated>
       <workItem from="1583250902302" duration="3096000" />
-      <workItem from="1583471065713" duration="16731000" />
+      <workItem from="1583471065713" duration="16986000" />
+      <workItem from="1583525540792" duration="880000" />
     </task>
     <servers />
   </component>
@@ -79,10 +93,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1583476264187" />
-    <state x="339" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1583524248744">
+    <state x="339" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1583525834986">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="339" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1583524248744" />
+    <state x="339" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1583525834986" />
     <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583472499842">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
