@@ -12,7 +12,7 @@ public interface INMSHandler
 
     Channel getSocketChannel(Player player);
 
-    Packet getPacket(Object packet);
+    Packet getPacket(Object packet) throws NoSuchFieldException, IllegalAccessException;
 
     LeftClickType digTypeToLeftClickType(Object digType);
 

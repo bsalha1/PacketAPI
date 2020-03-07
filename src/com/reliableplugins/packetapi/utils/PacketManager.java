@@ -3,6 +3,8 @@ package com.reliableplugins.packetapi.utils;
 import com.reliableplugins.packetapi.PacketAPI;
 import com.reliableplugins.packetapi.listeners.APacketListener;
 import com.reliableplugins.packetapi.listeners.ChannelListener;
+import com.reliableplugins.packetapi.listeners.IPacketListener;
+import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +20,6 @@ import java.util.Set;
 public class PacketManager implements Listener
 {
     private PacketAPI api;
-    private Map<Player, Set<String>> handlers = new LinkedHashMap<>();
 
     public PacketManager(PacketAPI api)
     {
@@ -36,6 +37,7 @@ public class PacketManager implements Listener
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event)
     {
+        api.unregisterPlayer(event.getPlayer());
         unloadChannelListener(event.getPlayer());
     }
 
@@ -43,7 +45,6 @@ public class PacketManager implements Listener
     {
         if(api.getNmsHandler().getSocketChannel(player).pipeline().toMap().containsKey(ChannelListener.class.getName()))
         {
-
             api.getNmsHandler()
                     .getSocketChannel(player)
                     .pipeline()
@@ -63,10 +64,17 @@ public class PacketManager implements Listener
     public void loadChannelListener(Player player)
     {
         ChannelListener channelListener = new ChannelListener(api, player);
+
+        for(APacketListener listener : api.getListeners())
+        {
+            channelListener.addListener(listener);
+        }
+
+        api.setChannelListener(player, channelListener);
         api.getNmsHandler()
                 .getSocketChannel(player)
                 .pipeline()
-                .addBefore("packet_handler", channelListener.getClass().getName(), channelListener);
+                .addBefore("packet_handler", ChannelListener.class.getName(), channelListener);
     }
 
     public void loadChannelListener()
@@ -76,10 +84,5 @@ public class PacketManager implements Listener
         {
             loadChannelListener(player);
         }
-    }
-
-    public void addPacketListener(APacketListener listener)
-    {
-
     }
 }

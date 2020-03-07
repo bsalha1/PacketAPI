@@ -11,10 +11,13 @@ import com.reliableplugins.packetapi.type.packet.server.entity.*;
 import com.reliableplugins.packetapi.utils.ReflectionUtils;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Field;
 
 public class Version_1_8_R3 implements INMSHandler
 {
@@ -31,120 +34,79 @@ public class Version_1_8_R3 implements INMSHandler
     }
 
     @Override
-    public Packet getPacket(Object packet)
+    public Packet getPacket(Object packet) throws NoSuchFieldException, IllegalAccessException
     {
-        if(packet instanceof PacketPlayOutBlockChange)
+        try
         {
-            PacketPlayOutBlockChange blockChange = (PacketPlayOutBlockChange) packet;
-            try
+            if(packet instanceof PacketPlayOutBlockChange)
             {
+                PacketPlayOutBlockChange blockChange = (PacketPlayOutBlockChange) packet;
                 BlockPosition bpos = ReflectionUtils.getPrivateField("a", blockChange);
                 return new PacketServerBlockChange(new Vector<>(bpos.getX(), bpos.getY(), bpos.getZ()),
                         CraftMagicNumbers.getMaterial(blockChange.block.getBlock()));
             }
-            catch(Exception e)
+            else if(packet instanceof PacketPlayOutMapChunkBulk)
             {
-                return null;
-            }
-        }
-        else if(packet instanceof PacketPlayOutMapChunkBulk)
-        {
-            PacketPlayOutMapChunkBulk mapChunkBulk = (PacketPlayOutMapChunkBulk) packet;
-            try
-            {
+                PacketPlayOutMapChunkBulk mapChunkBulk = (PacketPlayOutMapChunkBulk) packet;
                 int[] x = ReflectionUtils.getPrivateField("a", mapChunkBulk);
                 int[] z = ReflectionUtils.getPrivateField("b", mapChunkBulk);
                 World world = ReflectionUtils.getPrivateField("world", mapChunkBulk);
                 return new PacketServerMapChunkBulk(x, z, world.getWorld());
             }
-            catch(Exception e)
+            else if(packet instanceof PacketPlayInBlockDig)
             {
-                return null;
+                PacketPlayInBlockDig pack = (PacketPlayInBlockDig) packet;
+                BlockPosition bpos = pack.a();
+                return new PacketClientLeftClickBlock(
+                        new Vector<>(bpos.getX(), bpos.getY(), bpos.getZ()),
+                        directionToBlockFace(pack.b()),
+                        digTypeToLeftClickType(pack.c()));
             }
-        }
-        else if(packet instanceof PacketPlayInBlockDig)
-        {
-            PacketPlayInBlockDig pack = (PacketPlayInBlockDig) packet;
-            BlockPosition bpos = pack.a();
-            return new PacketClientLeftClickBlock(
-                    new Vector<>(bpos.getX(), bpos.getY(), bpos.getZ()),
-                    directionToBlockFace(pack.b()),
-                    digTypeToLeftClickType(pack.c()));
-        }
-        else if(packet instanceof PacketPlayOutEntity)
-        {
-            if(packet instanceof PacketPlayOutEntity.PacketPlayOutEntityLook)
+            else if(packet instanceof PacketPlayOutEntity)
             {
-                try
+                PacketPlayOutEntity entityPack = (PacketPlayOutEntity) packet;
+                int entityId = ReflectionUtils.getPrivateField("a", entityPack.getClass(), entityPack);
+                if(packet instanceof PacketPlayOutEntity.PacketPlayOutEntityLook)
                 {
+
                     PacketPlayOutEntity.PacketPlayOutEntityLook pack = (PacketPlayOutEntity.PacketPlayOutEntityLook) packet;
-                    int entityId = ReflectionUtils.getPrivateField("a", pack);
-                    byte yaw = ReflectionUtils.getPrivateField("e", pack);
-                    byte pitch = ReflectionUtils.getPrivateField("f", pack);
-                    boolean onGround = ReflectionUtils.getPrivateField("g", pack);
+                    byte yaw = ReflectionUtils.getPrivateField("e", pack.getClass(), pack);
+                    byte pitch = ReflectionUtils.getPrivateField("f", pack.getClass(), pack);
+                    boolean onGround = ReflectionUtils.getPrivateField("g", pack.getClass(), pack);
                     return new PacketServerEntityLook(entityId, yaw, pitch, onGround);
                 }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            else if(packet instanceof PacketPlayOutEntity.PacketPlayOutRelEntityMove)
-            {
-                try
+                else if(packet instanceof PacketPlayOutEntity.PacketPlayOutRelEntityMove)
                 {
                     PacketPlayOutEntity.PacketPlayOutRelEntityMove pack = (PacketPlayOutEntity.PacketPlayOutRelEntityMove) packet;
-                    int entityId = ReflectionUtils.getPrivateField("a", pack);
-                    byte dx = ReflectionUtils.getPrivateField("b", pack);
-                    byte dy = ReflectionUtils.getPrivateField("c", pack);
-                    byte dz = ReflectionUtils.getPrivateField("d", pack);
+
+                    byte dx = ReflectionUtils.getPrivateField("b", pack.getClass(), pack);
+                    byte dy = ReflectionUtils.getPrivateField("c", pack.getClass(), pack);
+                    byte dz = ReflectionUtils.getPrivateField("d", pack.getClass(), pack);
                     Vector<Byte> dr = new Vector<>(dx, dy, dz);
-                    boolean onGround = ReflectionUtils.getPrivateField("g", pack);
+                    boolean onGround = ReflectionUtils.getPrivateField("g", pack.getClass(), pack);
 
                     return new PacketServerRelEntityMove(entityId, dr, onGround);
                 }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            else if(packet instanceof PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook)
-            {
-                try
+                else if(packet instanceof PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook)
                 {
                     PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook pack = (PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook) packet;
-                    int entityId = ReflectionUtils.getPrivateField("a", pack);
-                    byte dx = ReflectionUtils.getPrivateField("b", pack);
-                    byte dy = ReflectionUtils.getPrivateField("c", pack);
-                    byte dz = ReflectionUtils.getPrivateField("d", pack);
+                    byte dx = ReflectionUtils.getPrivateField("b", pack.getClass(), pack);
+                    byte dy = ReflectionUtils.getPrivateField("c", pack.getClass(), pack);
+                    byte dz = ReflectionUtils.getPrivateField("d", pack.getClass(), pack);
                     Vector<Byte> dr = new Vector<>(dx, dy, dz);
-                    byte yaw = ReflectionUtils.getPrivateField("e", pack);
-                    byte pitch = ReflectionUtils.getPrivateField("f", pack);
-                    boolean onGround = ReflectionUtils.getPrivateField("g", pack);
+                    byte yaw = ReflectionUtils.getPrivateField("e", pack.getClass(), pack);
+                    byte pitch = ReflectionUtils.getPrivateField("f", pack.getClass(), pack);
+                    boolean onGround = ReflectionUtils.getPrivateField("g", pack.getClass(), pack);
                     return new PacketServerRelEntityMoveLook(entityId, dr, yaw, pitch, onGround);
                 }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
             }
-        }
-        else if(packet instanceof PacketPlayOutEntityDestroy)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityDestroy)
             {
                 PacketPlayOutEntityDestroy pack = (PacketPlayOutEntityDestroy) packet;
                 int[] entityIds = ReflectionUtils.getPrivateField("a", pack);
                 return new PacketServerEntityDestroy(entityIds);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutEntityEquipment)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityEquipment)
             {
                 PacketPlayOutEntityEquipment pack = (PacketPlayOutEntityEquipment) packet;
                 int var1 = ReflectionUtils.getPrivateField("a", pack);
@@ -152,58 +114,30 @@ public class Version_1_8_R3 implements INMSHandler
                 ItemStack item = ReflectionUtils.getPrivateField("c", pack);
                 org.bukkit.inventory.ItemStack stack = new org.bukkit.inventory.ItemStack(CraftMagicNumbers.getMaterial(item.getItem()), item.count);
                 return new PacketServerEntityEquipment(var1, var2, stack);
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
 
-        }
-        else if(packet instanceof PacketPlayOutEntityHeadRotation)
-        {
-            try
+            }
+            else if(packet instanceof PacketPlayOutEntityHeadRotation)
             {
                 PacketPlayOutEntityHeadRotation pack = (PacketPlayOutEntityHeadRotation) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
                 byte yaw = ReflectionUtils.getPrivateField("b", pack);
                 return new PacketServerEntityHeadRotation(entityId, yaw);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutEntityMetadata)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityMetadata)
             {
                 PacketPlayOutEntityMetadata pack = (PacketPlayOutEntityMetadata) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
                 // TODO: figure out what watchable contains
                 return new PacketServerEntityMetadata(entityId);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutEntityStatus)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityStatus)
             {
                 PacketPlayOutEntityStatus pack = (PacketPlayOutEntityStatus) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
                 byte data = ReflectionUtils.getPrivateField("b", pack);
                 return new PacketServerEntityStatus(entityId, data);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutEntityTeleport)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityTeleport)
             {
                 PacketPlayOutEntityTeleport pack = (PacketPlayOutEntityTeleport) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -217,14 +151,7 @@ public class Version_1_8_R3 implements INMSHandler
 
                 return new PacketServerEntityTeleport(entityId, vector, yaw, pitch, onGround);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutEntityVelocity)
-        {
-            try
+            else if(packet instanceof PacketPlayOutEntityVelocity)
             {
                 PacketPlayOutEntityVelocity pack = (PacketPlayOutEntityVelocity) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -235,14 +162,7 @@ public class Version_1_8_R3 implements INMSHandler
 
                 return new PacketServerEntityVelocity(entityId, v);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutAttachEntity)
-        {
-            try
+            else if(packet instanceof PacketPlayOutAttachEntity)
             {
                 PacketPlayOutAttachEntity pack = (PacketPlayOutAttachEntity) packet;
                 int var1 = ReflectionUtils.getPrivateField("a", pack);
@@ -250,14 +170,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int entityId2 = ReflectionUtils.getPrivateField("c", pack);
                 return new PacketServerAttachEntity(var1, entityId1, entityId2);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutSpawnEntity)
-        {
-            try
+            else if(packet instanceof PacketPlayOutSpawnEntity)
             {
                 PacketPlayOutSpawnEntity pack = (PacketPlayOutSpawnEntity) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -275,15 +188,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int objectData = ReflectionUtils.getPrivateField("k", pack);
                 return new PacketServerSpawnEntity(entityId, r, v, pitch, yaw, uuid, objectData);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-        else if(packet instanceof PacketPlayOutNamedEntitySpawn)
-        {
-            try
+            else if(packet instanceof PacketPlayOutNamedEntitySpawn)
             {
                 PacketPlayOutNamedEntitySpawn pack = (PacketPlayOutNamedEntitySpawn) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -297,29 +202,14 @@ public class Version_1_8_R3 implements INMSHandler
 
                 return new PacketServerNamedEntitySpawn(entityId, vector, yaw, pitch);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-        else if(packet instanceof PacketPlayOutRemoveEntityEffect)
-        {
-            try
+            else if(packet instanceof PacketPlayOutRemoveEntityEffect)
             {
                 PacketPlayOutRemoveEntityEffect pack = (PacketPlayOutRemoveEntityEffect) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
                 int potionEffectId = ReflectionUtils.getPrivateField("b", pack);
                 return new PacketServerRemoveEntityEffect(entityId, potionEffectId);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutSpawnEntityExperienceOrb)
-        {
-            try
+            else if(packet instanceof PacketPlayOutSpawnEntityExperienceOrb)
             {
                 PacketPlayOutSpawnEntityExperienceOrb pack = (PacketPlayOutSpawnEntityExperienceOrb) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -330,14 +220,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int count = ReflectionUtils.getPrivateField("e", pack);
                 return new PacketServerSpawnEntityExperienceOrb(entityId, r, count);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutSpawnEntityLiving)
-        {
-            try
+            else if(packet instanceof PacketPlayOutSpawnEntityLiving)
             {
                 PacketPlayOutSpawnEntityLiving pack = (PacketPlayOutSpawnEntityLiving) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -361,15 +244,7 @@ public class Version_1_8_R3 implements INMSHandler
 
                 return new PacketServerSpawnEntityLiving(entityId, uuid, r, v, yaw, pitch, headPitch);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-        else if(packet instanceof PacketPlayOutSpawnEntityPainting)
-        {
-            try
+            else if(packet instanceof PacketPlayOutSpawnEntityPainting)
             {
                 PacketPlayOutSpawnEntityPainting pack = (PacketPlayOutSpawnEntityPainting) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -379,16 +254,7 @@ public class Version_1_8_R3 implements INMSHandler
                 String painting = ReflectionUtils.getPrivateField("d", pack);
                 return new PacketServerSpawnEntityPainting(entityId, r, bface, painting);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-
-
-        }
-        else if(packet instanceof PacketPlayOutSpawnEntityWeather)
-        {
-            try
+            else if(packet instanceof PacketPlayOutSpawnEntityWeather)
             {
                 PacketPlayOutSpawnEntityWeather pack = (PacketPlayOutSpawnEntityWeather) packet;
                 int entityId = ReflectionUtils.getPrivateField("a", pack);
@@ -399,14 +265,7 @@ public class Version_1_8_R3 implements INMSHandler
                 int weatherType = ReflectionUtils.getPrivateField("e", pack);
                 return new PacketServerSpawnEntityWeather(entityId, r, weatherType);
             }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if(packet instanceof PacketPlayOutTileEntityData)
-        {
-            try
+            else if(packet instanceof PacketPlayOutTileEntityData)
             {
                 PacketPlayOutTileEntityData pack = (PacketPlayOutTileEntityData) packet;
                 BlockPosition bpos = ReflectionUtils.getPrivateField("a", pack);
@@ -415,14 +274,14 @@ public class Version_1_8_R3 implements INMSHandler
                 // TODO: handle NBT payload
                 return new PacketServerTileEntityData(r, action);
             }
-            catch(Exception e)
+            else if(packet instanceof PacketPlayOutUpdateEntityNBT)
             {
-                e.printStackTrace();
+                // TODO: literally no idea what anything does in this
             }
         }
-        else if(packet instanceof PacketPlayOutUpdateEntityNBT)
+        catch(Exception e)
         {
-            // TODO: literally no idea what anything does in this
+            e.printStackTrace();
         }
         return null;
     }

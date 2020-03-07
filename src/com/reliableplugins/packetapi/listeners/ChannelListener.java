@@ -17,12 +17,12 @@ import java.util.Set;
 public class ChannelListener extends ChannelDuplexHandler
 {
     private PacketAPI api;
-    private Set<Packet> packets;
+    private Set<APacketListener> listeners;
     private Player player;
 
     public ChannelListener(PacketAPI api, Player player)
     {
-        packets = new HashSet<>();
+        listeners = new HashSet<>();
         this.api = api;
         this.player = player;
     }
@@ -34,19 +34,21 @@ public class ChannelListener extends ChannelDuplexHandler
         INMSHandler nmsHandler = api.getNmsHandler();
         Packet packet = nmsHandler.getPacket(packetO);
 
-        if(packet != null)
+        if(packet == null)
         {
-//            Bukkit.broadcastMessage(packet.toString());
-        }
-        for(Packet p : packets)
-        {
-            if(p.getClass().isInstance(packet))
-            {
-                Bukkit.broadcastMessage(packet.toString());
-                break;
-            }
+            super.write(context, packetO, promise);
+            return;
         }
 
+
+        for(APacketListener listener : listeners)
+        {
+            if(listener.getPacketClass().isInstance(packet))
+            {
+                listener.onPacket(packet);
+//                Bukkit.broadcastMessage(listener.getPacketClass().getName());
+            }
+        }
         super.write(context, packetO, promise);
     }
 
@@ -56,18 +58,6 @@ public class ChannelListener extends ChannelDuplexHandler
     {
         INMSHandler nmsHandler = api.getNmsHandler();
         Packet packet = nmsHandler.getPacket(packetO);
-        if(packet != null)
-        {
-            Bukkit.broadcastMessage(packet.toString());
-        }
-        for(Packet p : packets)
-        {
-            if(p.getClass().isInstance(packet))
-            {
-                Bukkit.broadcastMessage(packet.toString());
-                break;
-            }
-        }
 
         super.channelRead(channelHandlerContext, packetO);
     }
@@ -77,14 +67,14 @@ public class ChannelListener extends ChannelDuplexHandler
         return player;
     }
 
-    public void listenTo(Packet packet)
+    public void addListener(APacketListener listener)
     {
-        packets.add(packet);
+        listeners.add(listener);
     }
 
-    public void unlistenTo(Packet packet)
+    public void removeListener(APacketListener listener)
     {
-        packets.remove(packet);
+        listeners.remove(listener);
     }
 
     public Object clone() throws CloneNotSupportedException

@@ -1,11 +1,8 @@
 package com.reliableplugins.packetapi.listeners;
 
-import com.reliableplugins.packetapi.type.packet.server.PacketServerBlockChange;
-import com.reliableplugins.packetapi.type.packet.server.chunk.PacketServerMapChunk;
+import com.reliableplugins.packetapi.type.packet.Packet;
 
-public interface IPacketListener
+public interface IPacketListener<T extends Packet>
 {
-    void onPacketServerBlockChange(PacketServerBlockChange packet);
-
-    void onPacketServerMapChunk(PacketServerMapChunk packet);
+    void onPacket(T packet);
 }

@@ -1,19 +1,18 @@
 package com.reliableplugins.packetapi.listeners;
 
-import com.reliableplugins.packetapi.type.packet.server.PacketServerBlockChange;
-import com.reliableplugins.packetapi.type.packet.server.chunk.PacketServerMapChunk;
+import com.reliableplugins.packetapi.type.packet.Packet;
 
-public class APacketListener implements IPacketListener
+public abstract class APacketListener<T extends Packet> implements IPacketListener<T>
 {
-    @Override
-    public void onPacketServerBlockChange(PacketServerBlockChange packet)
-    {
+    protected Class<T> packet;
 
+    public APacketListener(Class<T> packet)
+    {
+        this.packet = packet;
     }
 
-    @Override
-    public void onPacketServerMapChunk(PacketServerMapChunk packet)
+    public Class<T> getPacketClass()
     {
-
+        return packet;
     }
 }
